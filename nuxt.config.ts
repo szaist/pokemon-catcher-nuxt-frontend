@@ -10,6 +10,7 @@ export default defineNuxtConfig({
         POKEMON_API_URL: process.env.POKEMON_API_URL,
       },
   },
+  css: ['~/assets/css/tailwind.css'],
   modules: ['@nuxtjs/tailwindcss', 'shadcn-nuxt', '@pinia/nuxt'],
   shadcn: {
     prefix: '',
