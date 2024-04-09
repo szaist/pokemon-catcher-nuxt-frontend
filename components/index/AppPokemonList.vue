@@ -14,9 +14,9 @@ const ownedPokemon = (name: string) => {
 
 <template>
     <div class="max-w-[800px] mx-auto">
-        <p class="text-2xl font-bold" v-if="!pokemonStore.selectedType">Select a pokemon type...</p>
+        <p class="text-2xl font-bold" v-if="!pokemonStore.typeFilter">Select a pokemon type...</p>
         <div v-else-if="!pokemonStore.isLoading">
-            <div v-for="pokemon in pokemonStore.visiblePokemons" :key="pokemon.name" class="flex gap-4 items-center justify-between border px-4 py-1 rounded my-1" :class="{'bg-green-100': ownedPokemon(pokemon.name)}">
+            <div v-for="pokemon in pokemonStore.paginatedPokemons" :key="pokemon.name" class="flex gap-4 items-center justify-between border px-4 py-1 rounded my-1" :class="{'bg-green-100': ownedPokemon(pokemon.name)}">
                 <div class="text-2xl">{{ pokemon.name }}</div>
                 <Button variant="outline" @click="navigateToProfile(pokemon.name)">Visit profile</Button>
             </div>

@@ -9,15 +9,23 @@ export const usePokemonsStore = defineStore('pokemons', () => {
     
     const pagination = ref<{limit: number, offset: number}>({ limit: 25, offset: 0 })
 
-    const selectedType = ref<string>('all')
+    const typeFilter = ref<string>('all')
+    const ownedFilter = ref<boolean>(false)
     const isLoading = ref<boolean>(false)
     const search = ref<string>('')
-    const ownedOnly = ref<boolean>(false)
 
-    const ownedPokemonNames = computed(() => userPokemons.value.map(pokemon => pokemon.name))
-    const pokemonList = computed(() => ownedOnly.value ? pokemons.value.filter(p => ownedPokemonNames.value.includes(p.name)) : pokemons.value)
-    const filteredPokemons = computed(() => search.value === '' ? pokemonList.value : pokemonList.value.filter(pokemon => pokemon.name.includes(search.value)))
-    const visiblePokemons = computed(() => filteredPokemons?.value ? filteredPokemons.value.slice(pagination.value.offset, pagination.value.offset + pagination.value.limit) : [] )
+    const filteredPokemons = computed(() => {
+        let list = pokemons.value
+        
+        let pokemonNames = userPokemons.value.map(pokemon => pokemon.name)
+        if(ownedFilter.value) list = list.filter(p => pokemonNames.includes(p.name))
+
+        if(search.value !== '' ) list = list.filter(pokemon => pokemon.name.includes(search.value))
+
+        return list
+    })
+
+    const paginatedPokemons = computed(() => filteredPokemons.value.slice(pagination.value.offset, pagination.value.offset + pagination.value.limit))
 
     const totalPages = computed(() => Math.ceil(filteredPokemons.value.length / pagination.value.limit))
     const currentPage = computed(() => Math.ceil(pagination.value.offset / pagination.value.limit) + 1)
@@ -62,7 +70,7 @@ export const usePokemonsStore = defineStore('pokemons', () => {
         userPokemons.value = response
     }
 
-    watch(selectedType, async (type) => {
+    watch(typeFilter, async (type) => {
         if(type){
             isLoading.value = true
             
@@ -73,7 +81,7 @@ export const usePokemonsStore = defineStore('pokemons', () => {
         }
     })
 
-    watch(ownedOnly, () => {
+    watch(ownedFilter, () => {
         pagination.value.offset = 0
     })
 
@@ -104,12 +112,12 @@ export const usePokemonsStore = defineStore('pokemons', () => {
         }
         isLoading.value = false
     }
+
     return {
         userPokemons,
         pokemonTypes,
         search,
-        selectedType,
-        visiblePokemons,
+        typeFilter,
         filteredPokemons,
         fetchPokemonsByType,
         isLoading,
@@ -122,6 +130,7 @@ export const usePokemonsStore = defineStore('pokemons', () => {
         pagination,
         catchPokemon,
         releasePokemon,
-        ownedOnly
+        ownedFilter,
+        paginatedPokemons,
     }
 })

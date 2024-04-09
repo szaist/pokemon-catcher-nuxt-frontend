@@ -12,7 +12,7 @@ const pokemonTypes = computed(() => {
 </script>
 <template>
     <div>
-        <Select v-model:model-value="pokemonStore.selectedType">
+        <Select v-model:model-value="pokemonStore.typeFilter">
             <SelectTrigger>
                 <SelectValue placeholder="Select a type"/>
             </SelectTrigger>
