@@ -18,5 +18,11 @@ export default defineNuxtConfig({
   },
   imports: {
     dirs: ["components/ui", "composables/**"]
-  }
+  },
+  postcss: {
+    plugins: {
+      tailwindcss: {},
+      autoprefixer: {},
+    },
+  },
 })
