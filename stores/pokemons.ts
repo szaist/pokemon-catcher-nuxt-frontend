@@ -20,7 +20,11 @@ export const usePokemonsStore = defineStore('pokemons', () => {
         let userList = userPokemons.value
         
         if(ownedSortFilter.value !== '') userList = useSortPokemons(userList, ownedSortFilter.value)
-        if(ownedFilter.value) list = userList.map(pokemon => ({name: pokemon.name, url: `${useRuntimeConfig().public.POKEMON_API_URL}/pokemon/${pokemon.name}`}))
+        if(ownedFilter.value){
+            if(typeFilter.value !== 'all') userList = userList.filter(pokemon => list.map(pokemon => pokemon.name).includes(pokemon.name))
+
+            list = userList.map(pokemon => ({name: pokemon.name, url: `${useRuntimeConfig().public.POKEMON_API_URL}/pokemon/${pokemon.name}`}))
+        } 
         
         if(search.value !== '' ) list = list.filter(pokemon => pokemon.name.includes(search.value))
 

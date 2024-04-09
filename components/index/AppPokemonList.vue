@@ -23,7 +23,6 @@ const ownedPokemon = (name: string) => {
     <div v-else-if="!pokemonStore.isLoading">
       <div
         v-for="pokemon in pokemonStore.paginatedPokemons"
-        :key="pokemon"
         class="flex gap-4 items-center justify-between border px-4 py-1 rounded my-1"
         :class="{ 'bg-green-100': ownedPokemon(pokemon.name) }"
       >
@@ -33,6 +32,12 @@ const ownedPokemon = (name: string) => {
           @click="navigateToProfile(pokemon.name)"
           >Visit profile</Button
         >
+      </div>
+      <div
+        v-if="!pokemonStore.paginatedPokemons.length"
+        class="flex justify-center my-10"
+      >
+        <p class="text-3xl font-semibold">No pokemons found...</p>
       </div>
     </div>
     <div
