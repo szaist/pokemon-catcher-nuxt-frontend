@@ -8,18 +8,20 @@ export const usePokemonsStore = defineStore('pokemons', () => {
     const userPokemons = ref<Array<UserPokemon>>([])
     
     const pagination = ref<{limit: number, offset: number}>({ limit: 25, offset: 0 })
+    const isLoading = ref<boolean>(false)
 
+    const ownedSortFilter = ref<string>('')
     const typeFilter = ref<string>('all')
     const ownedFilter = ref<boolean>(false)
-    const isLoading = ref<boolean>(false)
     const search = ref<string>('')
 
     const filteredPokemons = computed(() => {
         let list = pokemons.value
+        let userList = userPokemons.value
         
-        let pokemonNames = userPokemons.value.map(pokemon => pokemon.name)
-        if(ownedFilter.value) list = list.filter(p => pokemonNames.includes(p.name))
-
+        if(ownedSortFilter.value !== '') userList = useSortPokemons(userList, ownedSortFilter.value)
+        if(ownedFilter.value) list = userList.map(pokemon => ({name: pokemon.name, url: `${useRuntimeConfig().public.POKEMON_API_URL}/pokemon/${pokemon.name}`}))
+        
         if(search.value !== '' ) list = list.filter(pokemon => pokemon.name.includes(search.value))
 
         return list
@@ -81,7 +83,7 @@ export const usePokemonsStore = defineStore('pokemons', () => {
         }
     })
 
-    watch(ownedFilter, () => {
+    watch(() => ownedFilter.value, () => {
         pagination.value.offset = 0
     })
 
@@ -132,5 +134,6 @@ export const usePokemonsStore = defineStore('pokemons', () => {
         releasePokemon,
         ownedFilter,
         paginatedPokemons,
+        ownedSortFilter
     }
 })
