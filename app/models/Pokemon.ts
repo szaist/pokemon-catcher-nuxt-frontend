@@ -1,7 +1,7 @@
 export type UserPokemon = {
+    id: string
     pokemonId: number
     name: string
-    type: string
     image: string
     height: number
     weight: number

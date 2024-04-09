@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import {type LoginUserRequest } from '~/app/contracts/LoginUserRequest'
+import {type LoginUserRequest } from '~/app/contracts/auth/LoginUserRequest'
 
 const authStore = useAuthStore()
 
@@ -23,10 +23,9 @@ const login = async () => {
         <div class="flex justify-center items-center h-screen">
             <Card class="w-[400px] p-4">
                 <CardHeader>
-                    <CardTile>
+                    <CardTitle>
                         <h1 class="text-2xl font-semibold text-center">Login</h1>
-                    </CardTile>
-
+                    </CardTitle>
                 </CardHeader>
                 <form class="mt-4" @submit.prevent="login">
                     <div class="mb-4">

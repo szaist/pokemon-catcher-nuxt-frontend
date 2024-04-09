@@ -1,7 +1,6 @@
 <script setup lang="ts">
 const pokemonStore = usePokemonsStore()
 
-
 const pokemonTypes = computed(() => {
     return pokemonStore.pokemonTypes.map(type => {
         return {
@@ -20,6 +19,7 @@ const pokemonTypes = computed(() => {
             <SelectContent>
                 <SelectGroup>
                     <SelectLabel>Type</SelectLabel>
+                    <SelectItem value="all">All</SelectItem>
                     <SelectItem v-for="pType in pokemonTypes" :value="pType.value" >
                         {{ pType.label }}
                     </SelectItem>

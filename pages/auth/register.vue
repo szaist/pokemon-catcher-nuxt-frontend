@@ -1,6 +1,5 @@
 <script lang="ts" setup>
-import {type LoginUserRequest } from '~/app/contracts/LoginUserRequest'
-import type { RegisterUserRequest } from '~/app/contracts/RegisterUserRequest';
+import type { RegisterUserRequest } from '~/app/contracts/auth/RegisterUserRequest';
 
 const authStore = useAuthStore()
 
@@ -14,6 +13,8 @@ const form = ref<RegisterUserRequest>({
 const register = async () => {
   try {
     await authStore.register(form.value)
+
+    navigateTo('/')
   } catch (error) {
     console.log(error);
   }
@@ -24,9 +25,9 @@ const register = async () => {
         <div class="flex justify-center items-center h-screen">
             <Card class="w-[400px] p-4">
                 <CardHeader>
-                    <CardTile>
+                    <CardTitle>
                         <h1 class="text-2xl font-semibold text-center">Register</h1>
-                    </CardTile>
+                    </CardTitle>
 
                 </CardHeader>
                 <form class="mt-4" @submit.prevent="register">

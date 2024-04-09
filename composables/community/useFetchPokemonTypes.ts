@@ -1,8 +1,5 @@
-import type { PaginationProps, PokePagination, Result } from "~/app/contracts";
+import type { PokePagination, PokeResult } from "~/app/types";
 
-export type PokemonType = Result
-
-export const useFetchPokemonTypes = async (): Promise<PokePagination<PokemonType>> => {
-
+export const useFetchPokemonTypes = async (): Promise<PokePagination<PokeResult>> => {
     return await useCommunityFetch('type', { method: "GET" });
 }

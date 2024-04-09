@@ -1,27 +1,26 @@
-export const useCommunityFetch = async <T>(request: string, opts?: any): Promise<T> => {
+export const useCommunityFetch = <T>(request: string, opts?: any): Promise<T> => {
     const config = useRuntimeConfig()
   
-    return await $fetch(request, { baseURL: config.public.POKEMON_API_URL, ...opts })
-  
+    return $fetch(request, { baseURL: config.public.POKEMON_API_URL, ...opts })
 }
 
-export const usePublicApiFetch = async <T>(
+export const usePublicApiFetch = <T>(
     request: string,
     opts?: any,
   ): Promise<T> => {
     const config = useRuntimeConfig()
   
-    return await $fetch(request, { baseURL: config.public.API_URL, ...opts })
+    return $fetch(request, { baseURL: config.public.API_URL, ...opts })
   }
   
-  export const useApiFetch = async <T>(
+  export const useApiFetch = <T>(
     request: string,
     opts?: any,
   ): Promise<T> => {
     const config = useRuntimeConfig()
     const authStore = useAuthStore()
   
-    return await $fetch(request, {
+    return $fetch(request, {
       baseURL: config.public.API_URL,
       ...opts,
       headers: {

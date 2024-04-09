@@ -1,6 +1,9 @@
 import { defineStore } from 'pinia'
-import type { LoginUserRequest } from '~/app/contracts/LoginUserRequest'
-import type { RegisterUserRequest } from '~/app/contracts/RegisterUserRequest'
+import type { LoginUserRequest } from '~/app/contracts/auth/LoginUserRequest'
+import type { RegisterUserRequest } from '~/app/contracts/auth/RegisterUserRequest'
+import { useLogin } from '~/composables/auth/useLogin'
+import { useLogout } from '~/composables/auth/useLogout'
+import { useRegister } from '~/composables/auth/useRegister'
 
 export const useAuthStore = defineStore('auth', () => {
     const token = useCookie('authorization_token', {
@@ -27,7 +30,7 @@ export const useAuthStore = defineStore('auth', () => {
         try {
             const response = await useRegister(request)
 
-            navigateTo('/auth/login')
+            setToken(response.token)
         }
         catch (error) {
             console.log(error);
@@ -36,12 +39,12 @@ export const useAuthStore = defineStore('auth', () => {
 
     const logout = async () => {
         try {
-            setToken('')
             await useLogout()
         }
         catch (error) {
             console.log(error);
         }
+        setToken('')
         navigateTo('/auth/login')
 
     }

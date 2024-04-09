@@ -1,10 +1,6 @@
-import type { PokePagination, Result, PaginationProps } from "~/app/contracts";
+import type { PokePagination, PokePaginationProps, PokeResult } from "~/app/types";
 
-
-
-export type PokePokemon = Result
-
-export const useFetchPokemons = async (pagination?: PaginationProps): Promise<PokePagination<PokePokemon>> => {
+export const useFetchPokemons = async (pagination?: PokePaginationProps): Promise<PokePagination<PokeResult>> => {
     const params = new URLSearchParams();
 
     if(pagination?.limit){
