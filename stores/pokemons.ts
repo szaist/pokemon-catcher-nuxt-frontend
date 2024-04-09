@@ -1,22 +1,51 @@
 import { defineStore } from "pinia";
-import type { PaginationProps } from "~/app/contracts";
 import type { UserPokemon } from "~/app/models/Pokemon";
-import type { PokemonType } from "~/composables/community/useFetchPokemonTypes";
-import { type PokePokemon } from "~/composables/community/useFetchPokemons";
+import type { PokeResult } from "~/app/types";
 
 export const usePokemonsStore = defineStore('pokemons', () => {
-    const pokemonTypes = ref<Array<PokemonType>>([])
-
-    const selectedType = ref<string>('')
-    const isLoading = ref<boolean>(false)
-
-    const pokemonList = ref<Array<PokePokemon>>([])
+    const pokemonTypes = ref<Array<PokeResult>>([])
+    const pokemons = ref<Array<PokeResult>>([])
     const userPokemons = ref<Array<UserPokemon>>([])
-    const pagination = ref<PaginationProps>({ offset: 0, limit: 20 })
+    
+    const pagination = ref<{limit: number, offset: number}>({ limit: 25, offset: 0 })
 
+    const typeFilter = ref<string>('all')
+    const ownedFilter = ref<boolean>(false)
+    const isLoading = ref<boolean>(false)
     const search = ref<string>('')
 
-    const filteredPokemons = computed(() => search.value === '' ? pokemonList.value :  pokemonList.value.filter(pokemon => pokemon.name.includes(search.value)))
+    const filteredPokemons = computed(() => {
+        let list = pokemons.value
+        
+        let pokemonNames = userPokemons.value.map(pokemon => pokemon.name)
+        if(ownedFilter.value) list = list.filter(p => pokemonNames.includes(p.name))
+
+        if(search.value !== '' ) list = list.filter(pokemon => pokemon.name.includes(search.value))
+
+        return list
+    })
+
+    const paginatedPokemons = computed(() => filteredPokemons.value.slice(pagination.value.offset, pagination.value.offset + pagination.value.limit))
+
+    const totalPages = computed(() => Math.ceil(filteredPokemons.value.length / pagination.value.limit))
+    const currentPage = computed(() => Math.ceil(pagination.value.offset / pagination.value.limit) + 1)
+
+    const firstPage = () => {
+        pagination.value.offset = 0
+    }
+    const lastPage = () => {
+        pagination.value.offset = (totalPages.value - 1) * pagination.value.limit
+    }
+    const nextPage = () => {
+        if(pagination.value.offset + pagination.value.limit < filteredPokemons.value.length){
+            pagination.value.offset += pagination.value.limit
+        }
+    }
+    const previousPage = () => {
+        if(pagination.value.offset - pagination.value.limit >= 0){
+            pagination.value.offset -= pagination.value.limit
+        }
+    }
 
     const fetchAllPokemonTypes = async () => {
         const response = await useFetchPokemonTypes()
@@ -25,19 +54,83 @@ export const usePokemonsStore = defineStore('pokemons', () => {
     }
 
     const fetchPokemonsByType = async (type: string) => {
-        const response = await useFetchPokemonsByType(type)
+        const { pokemon } = await useFetchPokemonsByType(type)
 
-        pokemonList.value = response.pokemon.map(pokemon => ({name: pokemon.pokemon.name, url: pokemon.pokemon.url }))
+        pokemons.value = pokemon.map(pokemon => ({name: pokemon.pokemon.name, url: pokemon.pokemon.url }))
+    }
+    const fetchAllPokemons = async () => {
+        const response = await useFetchPokemons({limit: 2000})
+
+        pokemons.value = response.results
     }
 
-    watch(selectedType, async (type) => {
+    const fetchUserPokemons = async () => {
+        const response = await useFetchUserPokemons()
+
+        userPokemons.value = response
+    }
+
+    watch(typeFilter, async (type) => {
         if(type){
             isLoading.value = true
-            await fetchPokemonsByType(getIdFromPokeApiUrl(type))
+            
+            if(type === 'all') await fetchAllPokemons()
+            else await fetchPokemonsByType(getIdFromPokeApiUrl(type))
+
             isLoading.value = false
         }
     })
 
+    watch(ownedFilter, () => {
+        pagination.value.offset = 0
+    })
+
     fetchAllPokemonTypes()
-    return {userPokemons, pokemonTypes, pagination, search, selectedType, filteredPokemons, fetchPokemonsByType, isLoading}
+    fetchAllPokemons()
+    fetchUserPokemons()
+
+    const catchPokemon = async (pokemonId: string) => {
+        try {
+            isLoading.value = true
+            const response = await useCatchPokemon(pokemonId)
+    
+            userPokemons.value.push(response)
+        } catch (error) {
+            console.error(error)
+        }
+        isLoading.value = false
+    }
+
+    const releasePokemon = async (pokemonId: string) => {
+        try {
+            isLoading.value = true
+            const response = await useReleasePokemon(pokemonId)
+    
+            userPokemons.value = userPokemons.value.filter(pokemon => pokemon.id !== pokemonId)
+        } catch (error) {
+            console.error(error)
+        }
+        isLoading.value = false
+    }
+
+    return {
+        userPokemons,
+        pokemonTypes,
+        search,
+        typeFilter,
+        filteredPokemons,
+        fetchPokemonsByType,
+        isLoading,
+        totalPages,
+        currentPage,
+        nextPage,
+        previousPage,
+        firstPage,
+        lastPage,
+        pagination,
+        catchPokemon,
+        releasePokemon,
+        ownedFilter,
+        paginatedPokemons,
+    }
 })
